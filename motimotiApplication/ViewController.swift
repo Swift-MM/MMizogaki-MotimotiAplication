@@ -20,9 +20,10 @@ class ViewController: UIViewController {
     @IBOutlet weak var fuckAndroid: UIImageView!
     @IBOutlet weak var attackCounterLabel: UILabel!
     @IBOutlet var timerLabel: UILabel!
+    
     var timer: Timer!
-    var count: Float = 0
-    var levelCount = 0
+    var count: Float = 0 /* 少数点以下の */
+    var levelCounterBox = 0
     var attackCount = 0
     var leftFlag:Bool!
     var rightFlag:Bool!
@@ -34,24 +35,40 @@ class ViewController: UIViewController {
         timer = Timer.scheduledTimer(timeInterval: 0.01, target: self, selector: #selector(ViewController.time(_:)), userInfo: nil, repeats: true)
         timer.invalidate()
         
+        
         self.leftFlag = true
         self.rightFlag = true
-        self.levealLabel.text = NSString(format:"Level:%d",levelCount) as String
+        self.levealLabel.text = NSString(format:"Level:%d",levelCounterBox) as String
     }
     
+    
+    /*
+     * ゲームスタートさせるメソッド！
+     */
     @IBAction func gameStart(_ sender: AnyObject) {
         
+        /*
+         * 
+         */
         let button = sender as! UIButton
         button.setTitle("Tap Start!", for: UIControlState())
         
         count = 0;
-        self.attackCount = (NSArray(contentsOfFile:Bundle.main.path(forResource: "levelList", ofType:"plist" )!)!.object(at: levelCount) as! NSString).integerValue
+        
+        // plistのデータを取ってくるで！
+        self.attackCount = (NSArray(contentsOfFile:Bundle.main.path(forResource: "levelList", ofType:"plist" )!)!.object(at: levelCounterBox) as! NSString).integerValue
+        
+        // フラグを初期化
         self.leftFlag = true
         self.rightFlag = true
+        
+        //　attackCountを表示
         self.attackCounterLabel.text = NSString(format:"%d",attackCount) as String
         
+        // 時計が動いているか確認
         if timer.isValid == false {
             
+            // 0.01秒ごとにtimeってメソッドを呼び出す！
             timer = Timer.scheduledTimer(timeInterval: 0.01, target: self, selector: #selector(ViewController.time(_:)), userInfo: nil, repeats: true)
             print(timer)
         }
@@ -59,6 +76,7 @@ class ViewController: UIViewController {
     }
     
     @IBAction func leftAction(_ sender: AnyObject) {
+        
         
         if self.leftFlag == true  {
             
@@ -105,11 +123,11 @@ class ViewController: UIViewController {
             if self.attackCount == 0 {
                 
                 self.timerStop("Clear")
-                self.levelCount += 1
-                self.levealLabel.text = NSString(format:"Level:%d",levelCount) as String
+                self.levelCounterBox += 1
+                self.levealLabel.text = NSString(format:"Level:%d",levelCounterBox) as String
             }else {
                 self.timerStop("Failed")
-                self.levelCount -= 1
+                self.levelCounterBox -= 1
             }
         }
     }
@@ -133,8 +151,8 @@ class ViewController: UIViewController {
                 self.attackCount -= 1
             }else {
                 self.timerStop("Clear")
-                self.levelCount += 1
-                self.levealLabel.text = NSString(format:"Level:%d",levelCount) as String
+                self.levelCounterBox += 1
+                self.levealLabel.text = NSString(format:"Level:%d",levelCounterBox) as String
             }
             self.attackCounterLabel.text = NSString(format:"%ld",self.attackCount) as String!
             
